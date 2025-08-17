@@ -121,7 +121,7 @@ export default function Login() {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => router.push("/(tabs)/home")}
+            onPress={() => router.push("/")}
             style={{ marginTop: 16 }}
           >
             <Text style={styles.linkCenter}>

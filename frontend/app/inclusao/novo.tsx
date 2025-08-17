@@ -5,7 +5,7 @@ export default function NovoRecursoInclusivo() {
     <PromptScreen
       titulo="Criar Recurso Inclusivo com IA"
       placeholder="Informe a necessidade (visual, auditiva, motora, TEA...), objetivo, adaptações e estratégias..."
-      destinoLista="/inclusao/index"
+      destinoLista="/inclusao"
       prefixoResultado="♿ Recurso inclusivo gerado:"
     />
   );

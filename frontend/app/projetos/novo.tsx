@@ -5,7 +5,7 @@ export default function NovoProjeto() {
     <PromptScreen
       titulo="Criar Projeto Pedagógico com IA"
       placeholder="Descreva o projeto: tema, objetivos, etapas, recursos, avaliação, interdisciplinaridade..."
-      destinoLista="/projetos/index"
+      destinoLista="/projetos"
       prefixoResultado="💡 Projeto gerado:"
     />
   );

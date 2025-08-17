@@ -5,7 +5,7 @@ export default function NovaProva() {
     <PromptScreen
       titulo="Gerar Prova/Questões com IA"
       placeholder="Informe disciplina, série, quantidade de questões, nível de dificuldade, habilidades (BNCC)..."
-      destinoLista="/provas/index"
+      destinoLista="/provas"
       prefixoResultado="📝 Prova/questões geradas:"
     />
   );

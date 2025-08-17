@@ -10,32 +10,48 @@ import {
 } from "react-native";
 import { useRouter, useLocalSearchParams, Href } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-
-type Item = {
-  id: string;
-  titulo: string;
-  descricao?: string;
-  tag?: string;
-  emoji?: string;
-};
+import { listContents, ContentItem, Category } from "@/services/contents";
 
 type Config = {
   titulo: string;
   ctaRotulo: string;
   ctaRota: Href;
-  seed?: Item[];
+  category: Category; // ✅ nova prop obrigatória
 };
 
 export default function makeListScreen(cfg: Config) {
   return function Screen() {
     const router = useRouter();
     const { novoItem } = useLocalSearchParams<{ novoItem?: string }>();
-    const [items, setItems] = useState<Item[]>(cfg.seed ?? []);
+    const [items, setItems] = useState<ContentItem[]>([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-      if (novoItem && typeof novoItem === "string") {
+      async function fetchData() {
+        try {
+          setLoading(true);
+          const data = await listContents(cfg.category);
+          setItems(data);
+        } catch (err) {
+          console.error("Erro ao carregar conteúdos:", err);
+        } finally {
+          setLoading(false);
+        }
+      }
+      fetchData();
+    }, [cfg.category]);
+
+    useEffect(() => {
+      // se veio novo item pelo router, atualiza lista
+      if (novoItem) {
         setItems((prev) => [
-          { id: Date.now().toString(), titulo: novoItem },
+          {
+            id: Date.now(),
+            title: novoItem,
+            body: "",
+            category: cfg.category,
+            created_at: new Date().toISOString(),
+          },
           ...prev,
         ]);
       }
@@ -44,7 +60,7 @@ export default function makeListScreen(cfg: Config) {
     return (
       <View style={s.safe}>
         <SafeAreaView>
-          {/* Topo personalizado */}
+          {/* Topo */}
           <View style={s.header}>
             <Pressable onPress={() => router.back()} style={s.backBtn}>
               <Ionicons
@@ -66,7 +82,7 @@ export default function makeListScreen(cfg: Config) {
           <FlatList
             contentContainerStyle={s.listContainer}
             data={items}
-            keyExtractor={(i) => i.id}
+            keyExtractor={(i) => i.id.toString()}
             renderItem={({ item }) => (
               <Pressable style={s.card}>
                 <View style={s.cardHeader}>
@@ -75,10 +91,8 @@ export default function makeListScreen(cfg: Config) {
                   )}
                   {!!item.tag && <Text style={s.cardTag}>{item.tag}</Text>}
                 </View>
-                <Text style={s.cardTitle}>{item.titulo}</Text>
-                {!!item.descricao && (
-                  <Text style={s.cardDesc}>{item.descricao}</Text>
-                )}
+                <Text style={s.cardTitle}>{item.title}</Text>
+                {!!item.body && <Text style={s.cardDesc}>{item.body}</Text>}
               </Pressable>
             )}
             ListEmptyComponent={
@@ -97,7 +111,6 @@ export default function makeListScreen(cfg: Config) {
     );
   };
 }
-
 const s = StyleSheet.create({
   safe: { flex: 1, backgroundColor: "#F7F7FA", padding: 20, paddingTop: 12 },
   header: {

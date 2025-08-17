@@ -5,7 +5,7 @@ export default function NovaHistoria() {
     <PromptScreen
       titulo="Criar História com IA"
       placeholder="Conte os elementos: tema, personagens, cenário, moral, tamanho desejado..."
-      destinoLista="/historias/index"
+      destinoLista="/historias"
       prefixoResultado="📖 História gerada:"
     />
   );

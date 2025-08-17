@@ -5,7 +5,7 @@ export default function NovoPlanejamento() {
     <PromptScreen
       titulo="Criar Planejamento com IA"
       placeholder="Descreva o planejamento: objetivos, atividades, tempo, avaliação..."
-      destinoLista="/planejamento/index"
+      destinoLista="/planejamento"
       prefixoResultado="🗓️ Planejamento gerado:"
     />
   );

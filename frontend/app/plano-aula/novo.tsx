@@ -5,7 +5,7 @@ export default function NovoPlanoAula() {
     <PromptScreen
       titulo="Criar Plano de Aula com IA"
       placeholder="Explique o plano: série/ano, tema, objetivos (BNCC), duração, recursos, etapas..."
-      destinoLista="/plano-aula/index"
+      destinoLista="/plano-aula"
       prefixoResultado="🧭 Plano de aula gerado:"
     />
   );

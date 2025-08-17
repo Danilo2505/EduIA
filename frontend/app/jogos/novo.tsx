@@ -5,7 +5,7 @@ export default function NovoJogo() {
     <PromptScreen
       titulo="Criar Jogo Educativo com IA"
       placeholder="Explique o jogo: conteúdo a reforçar, regras, materiais, tempo, variações..."
-      destinoLista="/jogos/index"
+      destinoLista="/jogos"
       prefixoResultado="🎮 Jogo educativo gerado:"
     />
   );
