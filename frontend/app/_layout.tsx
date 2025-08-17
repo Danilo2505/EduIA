@@ -1,25 +1,23 @@
+// app/_layout.tsx
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import "react-native-reanimated";
 
-export {
-  // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
-} from "expo-router";
+export { ErrorBoundary } from "expo-router";
 
+// Deixa o app abrir no grupo de auth por padrão (pode usar Redirect em /index depois)
 export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: "(tabs)",
+  initialRouteName: "(auth)",
 };
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
+// segura a splash até carregar as fontes
 SplashScreen.preventAutoHideAsync();
+
+const queryClient = new QueryClient();
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
@@ -27,39 +25,21 @@ export default function RootLayout() {
     ...FontAwesome.font,
   });
 
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
     if (error) throw error;
   }, [error]);
 
   useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
+    if (loaded) SplashScreen.hideAsync();
   }, [loaded]);
 
-  if (!loaded) {
-    return null;
-  }
+  if (!loaded) return null;
 
-  return <RootLayoutNav />;
-}
-const client = new QueryClient();
-
-function RootLayoutNav() {
   return (
-    <QueryClientProvider client={client}>
-      <Stack
-        screenOptions={{
-          headerShown: false, // remove o header de TODAS as telas
-        }}
-      >
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="atividades/index" />
-        <Stack.Screen name="atividades/novo" />
-        <Stack.Screen name="historias/index" />
-        <Stack.Screen name="historias/novo" />
-        {/* ...demais rotas */}
+    <QueryClientProvider client={queryClient}>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       </Stack>
     </QueryClientProvider>
   );

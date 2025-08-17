@@ -1,344 +1,333 @@
-import { useState } from "react";
+import React, { useMemo } from "react";
 import {
   View,
   Text,
-  TextInput,
-  TouchableOpacity,
+  Pressable,
   StyleSheet,
+  FlatList,
+  SafeAreaView,
   ActivityIndicator,
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
 } from "react-native";
-import { useRouter } from "expo-router";
-import { useRegisterMutation } from "@/hooks/useAuth";
+import { useRouter, Href } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient";
 
-export default function Register() {
+import { useSession } from "@/hooks/useSession";
+import { useLogout } from "@/hooks/useLogout";
+
+type Conteudo = {
+  id: string;
+  titulo: string;
+  descricao: string;
+  categoria: "Plano de Aula" | "Atividade" | "História";
+  emoji: string;
+};
+
+const MOCK_CONTEUDOS: Conteudo[] = [
+  {
+    id: "1",
+    titulo: "Plano de Aula - Matemática",
+    descricao: "Adição e subtração com jogos educativos",
+    categoria: "Plano de Aula",
+    emoji: "📚",
+  },
+  {
+    id: "2",
+    titulo: "História - A Galinha dos Ovos de Ouro",
+    descricao: "História infantil com moral educativa",
+    categoria: "História",
+    emoji: "📖",
+  },
+];
+
+type Atalho = {
+  label: string;
+  emoji: string;
+  to: Href;
+  gradient: [string, string];
+};
+
+export default function Home() {
   const router = useRouter();
-  const [nome, setNome] = useState("");
-  const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
-  const [confirmarSenha, setConfirmarSenha] = useState("");
-  const [mostrarSenha, setMostrarSenha] = useState(false);
-  const [mostrarConfirmar, setMostrarConfirmar] = useState(false);
-  const [aceitouTermos, setAceitouTermos] = useState(false);
+  const { data: session, isLoading } = useSession();
+  const logout = useLogout();
 
-  const { mutateAsync: doRegister, isPending } = useRegisterMutation({
-    onSuccess: () => {
-      Alert.alert("Conta criada!", "Faça login para continuar.");
-      router.replace({ pathname: "/login", params: { email } });
+  const primeiroNome = useMemo(() => {
+    if (!session?.name) return "Usuário";
+    return session.name.split(" ")[0];
+  }, [session]);
+
+  const atalhos: Atalho[] = [
+    {
+      label: "Plano de Aula",
+      emoji: "📚",
+      to: "/plano-aula",
+      gradient: ["#6EE7F9", "#3B82F6"],
     },
-    onError: (e: any) => {
-      const msg =
-        e?.response?.data?.message ||
-        e?.message ||
-        "Tente novamente em instantes.";
-      Alert.alert("Falha no registro", msg);
+    {
+      label: "Atividades",
+      emoji: "🎲",
+      to: "/atividades",
+      gradient: ["#FDE68A", "#F59E0B"],
     },
-  });
+    {
+      label: "Histórias",
+      emoji: "📖",
+      to: "/historias",
+      gradient: ["#FCA5A5", "#EF4444"],
+    },
+    {
+      label: "Criação de Provas",
+      emoji: "📝",
+      to: "/provas",
+      gradient: ["#A7F3D0", "#10B981"],
+    },
+    {
+      label: "Sugestões de Projetos",
+      emoji: "💡",
+      to: "/projetos",
+      gradient: ["#DDD6FE", "#8B5CF6"],
+    },
+    {
+      label: "Jogos Educativos",
+      emoji: "🎮",
+      to: "/jogos",
+      gradient: ["#FBCFE8", "#EC4899"],
+    },
+    {
+      label: "Recursos Inclusivos",
+      emoji: "♿",
+      to: "/inclusao",
+      gradient: ["#E0F2FE", "#0284C7"],
+    },
+    {
+      label: "Planejamento Semanal",
+      emoji: "🗓️",
+      to: "/planejamento",
+      gradient: ["#FDE68A", "#CA8A04"],
+    },
+    {
+      label: "Materiais de Apoio",
+      emoji: "📂",
+      to: "/materiais",
+      gradient: ["#FBCFE8", "#DB2777"],
+    },
+  ];
 
-  const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
-  const nomeOk = nome.trim().length >= 2;
-
-  // força simples: +1 por cada critério atendido
-  const senhaLen = senha.length >= 6;
-  const senhaUpper = /[A-Z]/.test(senha);
-  const senhaDigit = /\d/.test(senha);
-  const senhaSpecial = /[^A-Za-z0-9]/.test(senha);
-  const forca = [senhaLen, senhaUpper, senhaDigit, senhaSpecial].filter(
-    Boolean
-  ).length;
-
-  const senhaOk = forca >= 3; // ajuste se quiser exigir 4/4
-  const confirmaOk = confirmarSenha.length > 0 && senha === confirmarSenha;
-
-  const podeEnviar =
-    nomeOk && emailOk && senhaOk && confirmaOk && aceitouTermos && !isPending;
-
-  async function onSubmit() {
-    if (!podeEnviar) return;
-    await doRegister({
-      name: nome.trim(),
-      email: email.trim(),
-      password: senha,
-    });
+  function renderAtalho(a: Atalho) {
+    return (
+      <Pressable
+        key={a.label}
+        onPress={() => router.push(a.to)}
+        style={({ pressed }) => [
+          styles.atalho,
+          { transform: [{ scale: pressed ? 0.98 : 1 }] },
+        ]}
+      >
+        <LinearGradient colors={a.gradient} style={styles.atalhoGradient}>
+          <Text style={styles.atalhoEmoji}>{a.emoji}</Text>
+          <Text style={styles.atalhoTexto}>{a.label}</Text>
+        </LinearGradient>
+      </Pressable>
+    );
+  }
+  if (isLoading) {
+    return (
+      <SafeAreaView
+        style={[
+          styles.safe,
+          { justifyContent: "center", alignItems: "center" },
+        ]}
+      >
+        <ActivityIndicator />
+        <Text style={{ marginTop: 8, color: "#6B7280" }}>
+          Carregando sessão...
+        </Text>
+      </SafeAreaView>
+    );
+  }
+  function renderConteudo({ item }: { item: Conteudo }) {
+    return (
+      <Pressable
+        onPress={() => {}}
+        style={({ pressed }) => [styles.card, { opacity: pressed ? 0.85 : 1 }]}
+      >
+        <View style={styles.cardHeader}>
+          <Text style={styles.cardEmoji}>{item.emoji}</Text>
+          <Text style={styles.cardCategoria}>{item.categoria}</Text>
+        </View>
+        <Text style={styles.cardTitulo}>{item.titulo}</Text>
+        <Text style={styles.cardDescricao}>{item.descricao}</Text>
+      </Pressable>
+    );
   }
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: "#F3F4F6" }}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-    >
-      <ScrollView
-        contentContainerStyle={styles.center}
-        keyboardShouldPersistTaps="handled"
-      >
-        <View style={styles.card}>
-          <Text style={styles.title}>Criar Conta</Text>
-          <Text style={styles.subtitle}>
-            Cadastre-se para começar a usar o app.
-          </Text>
+    <SafeAreaView style={styles.safe}>
+      <FlatList
+        contentContainerStyle={styles.container}
+        ListHeaderComponent={
+          <>
+            {/* Cabeçalho */}
+            <View style={styles.header}>
+              <View>
+                <Text style={styles.boasVindas}>Olá, {primeiroNome} 👋</Text>
+                <Text style={styles.subBoasVindas}>
+                  O que vamos preparar hoje?
+                </Text>
+              </View>
 
-          <TextInput
-            style={styles.input}
-            placeholder="Nome completo"
-            value={nome}
-            onChangeText={setNome}
-            autoCapitalize="words"
-            autoComplete="name"
-            returnKeyType="next"
-          />
-          {!nomeOk && nome.length > 0 && (
-            <Text style={styles.helper}>Mínimo de 2 caracteres.</Text>
-          )}
-
-          <TextInput
-            style={styles.input}
-            placeholder="E-mail"
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-            autoComplete="email"
-            keyboardType="email-address"
-            returnKeyType="next"
-          />
-          {!emailOk && email.length > 0 && (
-            <Text style={styles.helper}>Informe um e-mail válido.</Text>
-          )}
-
-          {/* Senha */}
-          <View style={{ position: "relative" }}>
-            <TextInput
-              style={styles.input}
-              placeholder="Senha"
-              secureTextEntry={!mostrarSenha}
-              value={senha}
-              onChangeText={setSenha}
-              autoCapitalize="none"
-              autoComplete="password-new"
-              returnKeyType="next"
-            />
-            <TouchableOpacity
-              style={styles.toggle}
-              onPress={() => setMostrarSenha((v) => !v)}
-              hitSlop={10}
-            >
-              <Text style={styles.toggleText}>
-                {mostrarSenha ? "Ocultar" : "Mostrar"}
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Barra de força da senha */}
-          {senha.length > 0 && (
-            <View style={styles.strengthWrap}>
-              <View
-                style={[
-                  styles.strengthBar,
-                  forca >= 1 && { backgroundColor: "#F59E0B" },
-                ]}
-              />
-              <View
-                style={[
-                  styles.strengthBar,
-                  forca >= 2 && { backgroundColor: "#F59E0B" },
-                ]}
-              />
-              <View
-                style={[
-                  styles.strengthBar,
-                  forca >= 3 && { backgroundColor: "#10B981" },
-                ]}
-              />
-              <View
-                style={[
-                  styles.strengthBar,
-                  forca >= 4 && { backgroundColor: "#10B981" },
-                ]}
-              />
+              {/* Avatar + Logout */}
+              <View style={{ alignItems: "center" }}>
+                <View style={styles.avatar}>
+                  <Text style={styles.avatarTexto}>
+                    {primeiroNome?.[0]?.toUpperCase()}
+                  </Text>
+                </View>
+                <Pressable
+                  onPress={async () => {
+                    await logout();
+                    router.replace("/login");
+                  }}
+                  style={{ marginTop: 6 }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 12,
+                      color: "#EF4444",
+                      fontWeight: "600",
+                    }}
+                  >
+                    Sair
+                  </Text>
+                </Pressable>
+              </View>
             </View>
-          )}
-          {senha.length > 0 && (
-            <Text style={styles.strengthHint}>
-              Dica: use 6+ caracteres com maiúscula, número e símbolo.
-            </Text>
-          )}
 
-          {/* Confirmar senha */}
-          <View style={{ position: "relative" }}>
-            <TextInput
-              style={styles.input}
-              placeholder="Confirmar senha"
-              secureTextEntry={!mostrarConfirmar}
-              value={confirmarSenha}
-              onChangeText={setConfirmarSenha}
-              autoCapitalize="none"
-              returnKeyType="done"
-              onSubmitEditing={onSubmit}
-            />
-            <TouchableOpacity
-              style={styles.toggle}
-              onPress={() => setMostrarConfirmar((v) => !v)}
-              hitSlop={10}
-            >
-              <Text style={styles.toggleText}>
-                {mostrarConfirmar ? "Ocultar" : "Mostrar"}
-              </Text>
-            </TouchableOpacity>
-          </View>
-          {!confirmaOk && confirmarSenha.length > 0 && (
-            <Text style={styles.helper}>As senhas não coincidem.</Text>
-          )}
+            {/* Atalhos rápidos */}
+            <View style={styles.atalhosContainer}>
+              {atalhos.map(renderAtalho)}
+            </View>
 
-          {/* Termos */}
-          <View style={styles.termsRow}>
-            <TouchableOpacity
-              onPress={() => setAceitouTermos((v) => !v)}
-              style={[styles.checkbox, aceitouTermos && styles.checkboxOn]}
-            >
-              {aceitouTermos && <Text style={{ fontWeight: "900" }}>✓</Text>}
-            </TouchableOpacity>
-            <Text style={styles.termsText}>
-              Li e aceito os{" "}
-              <Text
-                style={styles.linkInline}
-                onPress={() => router.push("/termos")}
-              >
-                Termos de Uso
-              </Text>{" "}
-              e a{" "}
-              <Text
-                style={styles.linkInline}
-                onPress={() => router.push("/privacidade")}
-              >
-                Política de Privacidade
-              </Text>
-              .
+            {/* Título seção */}
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitulo}>Últimos conteúdos</Text>
+              <Pressable onPress={() => router.push("/conteudos/index")}>
+                <Text style={styles.verTodos}>Ver todos</Text>
+              </Pressable>
+            </View>
+          </>
+        }
+        data={MOCK_CONTEUDOS}
+        keyExtractor={(i) => i.id}
+        renderItem={renderConteudo}
+        ListEmptyComponent={
+          <View style={styles.empty}>
+            <Text style={styles.emptyEmoji}>✨</Text>
+            <Text style={styles.emptyTitulo}>Nada por aqui ainda</Text>
+            <Text style={styles.emptyDescricao}>
+              Crie seu primeiro plano de aula, atividade ou história usando os
+              atalhos acima.
             </Text>
           </View>
-
-          <TouchableOpacity
-            style={[styles.button, !podeEnviar && { opacity: 0.6 }]}
-            onPress={onSubmit}
-            disabled={!podeEnviar}
-          >
-            {isPending ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.buttonText}>Cadastrar</Text>
-            )}
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => router.push("/login")}
-            style={{ marginTop: 16 }}
-          >
-            <Text style={styles.linkCenter}>
-              Já tem conta? <Text style={{ fontWeight: "800" }}>Entrar</Text>
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        }
+        showsVerticalScrollIndicator={false}
+      />
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  center: {
-    flexGrow: 1,
-    padding: 20,
-    justifyContent: "center", 
-    alignItems: "center", 
-  },
-  card: {
-    width: "100%",
-    maxWidth: 420,
-    backgroundColor: "#fff",
-    borderRadius: 16,
-    padding: 20,
-    shadowColor: "#000",
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 4,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "800",
-    textAlign: "center",
-    color: "#111827",
-  },
-  subtitle: {
-    textAlign: "center",
-    color: "#6B7280",
-    marginTop: 4,
-    marginBottom: 16,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
-    backgroundColor: "#fff",
-    padding: 12,
-    borderRadius: 10,
-    marginBottom: 10,
-    fontSize: 14,
-  },
-  helper: { fontSize: 12, color: "#EF4444", marginTop: -6, marginBottom: 8 },
-  toggle: {
-    position: "absolute",
-    right: 12,
-    top: 12,
-  },
-  toggleText: { color: "#2563EB", fontWeight: "600" },
-  strengthWrap: {
-    flexDirection: "row",
-    gap: 6,
-    marginTop: -4,
-    marginBottom: 8,
-  },
-  strengthBar: {
-    flex: 1,
-    height: 6,
-    borderRadius: 999,
-    backgroundColor: "#E5E7EB",
-  },
-  strengthHint: { fontSize: 12, color: "#6B7280", marginBottom: 8 },
-  termsRow: {
+  safe: { flex: 1, backgroundColor: "#F7F7FA" },
+  container: { paddingHorizontal: 20, paddingTop: 16, paddingBottom: 40 },
+  header: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
-    marginTop: 4,
-    marginBottom: 8,
+    justifyContent: "space-between",
+    marginBottom: 20,
   },
-  checkbox: {
-    width: 20,
-    height: 20,
-    borderRadius: 6,
-    borderWidth: 1.5,
-    borderColor: "#D1D5DB",
+  boasVindas: { fontSize: 22, fontWeight: "700", color: "#1F2937" },
+  subBoasVindas: { fontSize: 14, color: "#6B7280", marginTop: 2 },
+  avatar: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: "#E5E7EB",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#fff",
   },
-  checkboxOn: {
-    backgroundColor: "#D1FAE5",
-    borderColor: "#10B981",
+  avatarTexto: { fontSize: 16, fontWeight: "700", color: "#374151" },
+  atalhosContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    marginBottom: 18,
   },
-  termsText: { flex: 1, color: "#374151", fontSize: 12 },
-  linkInline: { color: "#2563EB", fontWeight: "600" },
-  button: {
-    backgroundColor: "#10B981",
+  atalho: {
+    width: "30%",
+    marginBottom: 12,
+    borderRadius: 14,
+    overflow: "hidden",
+  },
+  atalhoGradient: {
+    minHeight: 100,
     paddingVertical: 14,
-    borderRadius: 10,
+    paddingHorizontal: 8,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  atalhoEmoji: { fontSize: 26, marginBottom: 6 },
+  atalhoTexto: {
+    color: "#fff",
+    fontWeight: "800",
+    fontSize: 13,
+    textAlign: "center",
+    lineHeight: 16,
+    flexShrink: 1,
+  },
+  sectionHeader: {
+    marginTop: 6,
+    marginBottom: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  sectionTitulo: { fontSize: 16, fontWeight: "700", color: "#111827" },
+  verTodos: { fontSize: 13, color: "#2563EB", fontWeight: "600" },
+  card: {
+    backgroundColor: "#fff",
+    borderRadius: 14,
+    padding: 14,
+    marginBottom: 12,
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  cardHeader: { flexDirection: "row", alignItems: "center", marginBottom: 6 },
+  cardEmoji: { fontSize: 18, marginRight: 6 },
+  cardCategoria: { fontSize: 12, color: "#6B7280", fontWeight: "600" },
+  cardTitulo: { fontSize: 16, fontWeight: "700", color: "#111827" },
+  cardDescricao: {
+    fontSize: 13.5,
+    color: "#4B5563",
+    marginTop: 4,
+    lineHeight: 20,
+  },
+  empty: {
+    backgroundColor: "#fff",
+    borderRadius: 14,
+    padding: 24,
     alignItems: "center",
     marginTop: 8,
   },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "800",
-    fontSize: 16,
+  emptyEmoji: { fontSize: 28, marginBottom: 8 },
+  emptyTitulo: { fontSize: 16, fontWeight: "700", color: "#111827" },
+  emptyDescricao: {
+    fontSize: 13.5,
+    color: "#6B7280",
+    textAlign: "center",
+    marginTop: 6,
+    lineHeight: 18,
   },
-  socialText: { color: "#111827", fontWeight: "700" },
-  linkCenter: { textAlign: "center", color: "#2563EB" },
 });

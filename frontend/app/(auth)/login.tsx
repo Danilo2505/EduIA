@@ -23,7 +23,7 @@ export default function Login() {
   const [mostrarSenha, setMostrarSenha] = useState(false);
 
   const { mutateAsync: doLogin, isPending } = useLoginMutation({
-    onSuccess: () => router.replace("/home"),
+    onSuccess: () => router.replace("/(tabs)"),
     onError: (e: any) =>
       Alert.alert(
         "Falha no login",
@@ -103,7 +103,7 @@ export default function Login() {
 
           <View style={styles.actionsRow}>
             <View style={{ flex: 1 }} />
-            <TouchableOpacity onPress={() => router.push("/recuperar-senha")}>
+            <TouchableOpacity onPress={() => router.push("/")}>
               <Text style={styles.linkInline}>Esqueci minha senha</Text>
             </TouchableOpacity>
           </View>
@@ -121,7 +121,7 @@ export default function Login() {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => router.push("/")}
+            onPress={() => router.push("/(tabs)/home")}
             style={{ marginTop: 16 }}
           >
             <Text style={styles.linkCenter}>
