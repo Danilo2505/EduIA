@@ -1,4 +1,3 @@
-// app/(tabs)/home.tsx  (ou app/index.tsx, conforme seu projeto)
 import React, { useMemo } from "react";
 import {
   View,
@@ -218,15 +217,22 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
 
-  /* Cabeçalho */
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     marginBottom: 20,
   },
-  boasVindas: { fontSize: 22, fontWeight: "700", color: "#1F2937" },
-  subBoasVindas: { fontSize: 14, color: "#6B7280", marginTop: 2 },
+  boasVindas: {
+    fontSize: 22,
+    fontWeight: "700",
+    color: "#1F2937",
+  },
+  subBoasVindas: {
+    fontSize: 14,
+    color: "#6B7280",
+    marginTop: 2,
+  },
 
   avatar: {
     width: 44,
@@ -236,7 +242,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  avatarTexto: { fontSize: 16, fontWeight: "700", color: "#374151" },
+  avatarTexto: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#374151",
+  },
 
   /* Atalhos (grid) */
   atalhosContainer: {
@@ -258,7 +268,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  atalhoEmoji: { fontSize: 26, marginBottom: 6 },
+  atalhoEmoji: {
+    fontSize: 26,
+    marginBottom: 6,
+  },
   atalhoTexto: {
     color: "#fff",
     fontWeight: "800",
@@ -276,8 +289,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
   },
-  sectionTitulo: { fontSize: 16, fontWeight: "700", color: "#111827" },
-  verTodos: { fontSize: 13, color: "#2563EB", fontWeight: "600" },
+  sectionTitulo: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#111827",
+  },
+  verTodos: {
+    fontSize: 13,
+    color: "#2563EB",
+    fontWeight: "600",
+  },
 
   /* Cards */
   card: {
@@ -296,8 +317,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 6,
   },
-  cardEmoji: { fontSize: 18, marginRight: 6 },
-  cardCategoria: { fontSize: 12, color: "#6B7280", fontWeight: "600" },
+  cardEmoji: {
+    fontSize: 18,
+    marginRight: 6,
+  },
+  cardCategoria: {
+    fontSize: 12,
+    color: "#6B7280",
+    fontWeight: "600",
+  },
   cardTitulo: { fontSize: 16, fontWeight: "700", color: "#111827" },
   cardDescricao: {
     fontSize: 13.5,
@@ -314,8 +342,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 8,
   },
-  emptyEmoji: { fontSize: 28, marginBottom: 8 },
-  emptyTitulo: { fontSize: 16, fontWeight: "700", color: "#111827" },
+  emptyEmoji: {
+    fontSize: 28,
+    marginBottom: 8,
+  },
+  emptyTitulo: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#111827",
+  },
   emptyDescricao: {
     fontSize: 13.5,
     color: "#6B7280",

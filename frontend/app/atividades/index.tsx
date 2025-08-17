@@ -1,4 +1,4 @@
-import makeListScreen from "@/components/makeListScreen";
+import makeListScreen from "@/layouts/makeListScreen";
 export default makeListScreen({
   titulo: "Atividades Lúdicas",
   ctaRotulo: "Nova Atividade",

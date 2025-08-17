@@ -1,4 +1,4 @@
-import PromptScreen from "@/components/Prompt";
+import PromptScreen from "@/layouts/Prompt";
 
 export default function NovoMaterial() {
   return (
