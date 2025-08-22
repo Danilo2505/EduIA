@@ -1,8 +1,15 @@
 import { http } from "./http";
 
 export type Category =
-  | "PLANO_AULA" | "ATIVIDADE" | "HISTORIA" | "PROVA" | "PROJETO"
-  | "JOGO" | "INCLUSAO" | "PLANEJAMENTO" | "MATERIAL";
+  | "PLANO_AULA"
+  | "ATIVIDADE"
+  | "HISTORIA"
+  | "PROVA"
+  | "PROJETO"
+  | "JOGO"
+  | "INCLUSAO"
+  | "PLANEJAMENTO"
+  | "MATERIAL";
 
 export type ContentItem = {
   id: number;
@@ -14,9 +21,18 @@ export type ContentItem = {
   created_at: string;
 };
 
-export async function listContents(category?: Category): Promise<ContentItem[]> {
-  const url = category ? `/contents?category=${encodeURIComponent(category)}` : "/contents";
+export async function listContents(
+  category?: Category
+): Promise<ContentItem[]> {
+  const url = category
+    ? `/contents?category=${encodeURIComponent(category)}`
+    : "/contents";
   const { data } = await http.get(url);
+  return data;
+}
+
+export async function getContentById(id: number): Promise<ContentItem> {
+  const { data } = await http.get(`/contents/${id}`);
   return data;
 }
 
@@ -31,12 +47,15 @@ export async function createContent(payload: {
   return data;
 }
 
-export async function updateContent(id: number, payload: {
-  title: string;
-  body: string;
-  tag?: string;
-  emoji?: string;
-}): Promise<{ ok: true }> {
+export async function updateContent(
+  id: number,
+  payload: {
+    title: string;
+    body: string;
+    tag?: string;
+    emoji?: string;
+  }
+): Promise<{ ok: true }> {
   const { data } = await http.put(`/contents/${id}`, payload);
   return data;
 }

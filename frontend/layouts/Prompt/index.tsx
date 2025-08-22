@@ -1,4 +1,3 @@
-// layouts/Prompt/index.tsx
 import React, { useState } from "react";
 import {
   View,
@@ -13,28 +12,11 @@ import { useRouter, Href } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
-import * as Print from "expo-print";
-import * as Sharing from "expo-sharing";
 
 import { useAIGenerate } from "@/hooks/useAI";
 import { createContent } from "@/services/contents";
-
-function limparMarkdown(texto: string) {
-  let contador = 1;
-
-  return texto
-    .replace(/^#{1,6}\s?/gm, "") // títulos (#, ##, ###)
-    .replace(/\*\*(.*?)\*\*/g, "$1") // negrito **
-    .replace(/\*(.*?)\*/g, "$1") // itálico *
-    .replace(/_{1,3}(.*?)_{1,3}/g, "$1") // underline com _
-    .replace(/`{1,3}(.*?)`{1,3}/g, "$1") // inline code
-    .replace(/^-{3,}$/gm, "") // linhas ---
-    .replace(/^\s*-\s+/gm, () => `• `) // listas com - → bolinha
-    .replace(/^\s*\*\s+/gm, () => `• `) // listas com * → bolinha
-    .replace(/^\s*\d+\.\s+/gm, () => `${contador++}. `) // listas numeradas
-    .replace(/>\s?/g, "") // blockquote >
-    .trim();
-}
+import { limparMarkdown } from "@/utils/limparMarkdown";
+import { gerarPDF } from "@/utils/gerarPDF";
 
 type Category =
   | "PLANO_AULA"
@@ -82,62 +64,7 @@ export default function Prompt({
   }
 
   async function baixarPDF() {
-    try {
-      const html = `
-      <html>
-        <head>
-          <style>
-            body {
-              font-family: Arial, sans-serif;
-              padding: 40px;
-              background-color: #fdfdfd;
-              color: #333;
-            }
-            h1 {
-              text-align: center;
-              color: #2563EB;
-              margin-bottom: 30px;
-              font-size: 24px;
-            }
-            p {
-              line-height: 1.6;
-              font-size: 15px;
-              margin: 8px 0;
-              white-space: pre-wrap;
-            }
-            .box {
-              background: #fff;
-              border: 1px solid #ddd;
-              border-radius: 10px;
-              padding: 20px;
-              margin-bottom: 20px;
-              box-shadow: 0 2px 5px rgba(0,0,0,0.08);
-            }
-            .footer {
-              text-align: center;
-              font-size: 12px;
-              color: #777;
-              margin-top: 40px;
-            }
-          </style>
-        </head>
-        <body>
-          <h1>${tituloItem || titulo}</h1>
-          <div class="box">
-            <p>${limparMarkdown(resposta)}</p>
-          </div>
-          
-        </body>
-      </html>
-    `;
-      const { uri } = await Print.printToFileAsync({ html });
-      await Sharing.shareAsync(uri, {
-        UTI: ".pdf",
-        mimeType: "application/pdf",
-      });
-    } catch {
-      Alert.alert("Erro", "Não foi possível gerar o PDF.");
-    }
+    await gerarPDF(tituloItem || titulo, resposta);
   }
 
   async function gerar() {
@@ -151,7 +78,6 @@ export default function Prompt({
 
   async function salvar() {
     if (!resposta) return;
-
     try {
       await createContent({
         title: tituloItem.trim(),
@@ -160,7 +86,6 @@ export default function Prompt({
         tag: "IA",
         emoji: "🧠",
       });
-
       router.push(destinoLista as any);
     } catch (e: any) {
       Alert.alert(
@@ -172,7 +97,6 @@ export default function Prompt({
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#F7F7FA" }}>
-      {/* Header */}
       <View style={s.header}>
         <Pressable onPress={() => router.back()} style={s.backBtn}>
           <Ionicons name="arrow-back" size={22} color="#111" />
@@ -211,11 +135,9 @@ export default function Prompt({
         {!!resposta && (
           <View style={s.result}>
             <Text style={s.resultTitle}>{tituloItem}</Text>
-
             <Text style={{ color: "#6B7280", marginBottom: 8 }}>
               {prefixoResultado}
             </Text>
-
             <Text style={s.resultText}>{resposta}</Text>
 
             <View style={s.actionsRow}>

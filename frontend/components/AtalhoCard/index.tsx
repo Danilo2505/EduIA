@@ -1,70 +1,125 @@
 import React from "react";
-import { Pressable, Text, StyleSheet, View } from "react-native";
-import { useRouter, Href } from "expo-router";
+import {
+  View,
+  Text,
+  Pressable,
+  StyleSheet,
+  FlatList,
+  Platform,
+} from "react-native";
+import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 
-export type Atalho = {
+type Atalho = {
   label: string;
   icon: keyof typeof Ionicons.glyphMap;
-  to: Href;
-  color?: string; // cor opcional para o fundo
+  color: string;
+  to: string;
 };
 
-export default function AtalhoCard({
-  label,
-  icon,
-  to,
-  color = "#2563EB",
-}: Atalho) {
+const atalhos: Atalho[] = [
+  {
+    label: "Plano de Aula",
+    icon: "book-outline",
+    color: "#2563EB",
+    to: "/plano-aula",
+  },
+  {
+    label: "Atividades",
+    icon: "create-outline",
+    color: "#F59E0B",
+    to: "/atividades",
+  },
+  {
+    label: "Histórias",
+    icon: "library-outline",
+    color: "#EF4444",
+    to: "/historias",
+  },
+  {
+    label: "Criação de Provas",
+    icon: "document-text-outline",
+    color: "#10B981",
+    to: "/provas",
+  },
+  {
+    label: "Projetos",
+    icon: "bulb-outline",
+    color: "#8B5CF6",
+    to: "/projetos",
+  },
+  {
+    label: "Jogos Educativos",
+    icon: "game-controller-outline",
+    color: "#EC4899",
+    to: "/jogos",
+  },
+  {
+    label: "Inclusivos",
+    icon: "accessibility-outline",
+    color: "#06B6D4",
+    to: "/inclusao",
+  },
+  {
+    label: "Planejamento",
+    icon: "calendar-outline",
+    color: "#D97706",
+    to: "/planejamento",
+  },
+  {
+    label: "Materiais",
+    icon: "folder-outline",
+    color: "#7C3AED",
+    to: "/materiais",
+  },
+];
+
+export default function AtalhosGrid() {
   const router = useRouter();
 
-  return (
+  const renderItem = ({ item }: { item: Atalho }) => (
     <Pressable
-      onPress={() => router.push(to)}
-      style={({ pressed }) => [
-        styles.atalho,
-        { transform: [{ scale: pressed ? 0.96 : 1 }] },
-      ]}
+      style={[styles.card, { backgroundColor: item.color }]}
+      android_ripple={{ color: "rgba(255,255,255,0.2)" }}
+      onPress={() => router.push(item.to as any)}
     >
-      <View style={[styles.container, { backgroundColor: color }]}>
-        <View style={styles.iconWrapper}>
-          <Ionicons name={icon} size={26} color="#fff" />
-        </View>
-        <Text style={styles.label}>{label}</Text>
-      </View>
+      <Ionicons name={item.icon} size={28} color="#fff" />
+      <Text style={styles.label}>{item.label}</Text>
     </Pressable>
+  );
+
+  return (
+    <FlatList
+      data={atalhos}
+      renderItem={renderItem}
+      keyExtractor={(item) => item.to}
+      numColumns={2}
+      columnWrapperStyle={{ justifyContent: "space-between" }}
+      contentContainerStyle={{ paddingVertical: 8 }}
+    />
   );
 }
 
 const styles = StyleSheet.create({
-  atalho: {
-    width: "30%",
-    marginBottom: 14,
-    borderRadius: 16,
-    overflow: "hidden",
-    elevation: 3,
-  },
-  container: {
-    minHeight: 110,
-    paddingVertical: 14,
-    paddingHorizontal: 8,
+  card: {
+    flex: 1,
+    marginBottom: 12,
+    marginHorizontal: 4,
+    borderRadius: 12,
+    paddingVertical: 20,
     alignItems: "center",
     justifyContent: "center",
-  },
-  iconWrapper: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: "rgba(255,255,255,0.2)",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 8,
+    height: 120,
+    ...Platform.select({
+      ios: { shadowColor: "#000", shadowOpacity: 0.1, shadowRadius: 6 },
+      android: { elevation: 3 },
+    }),
   },
   label: {
+    fontSize: 14,
+    fontWeight: "600",
     color: "#fff",
-    fontWeight: "700",
-    fontSize: 13,
+    marginTop: 6,
     textAlign: "center",
-    lineHeight: 16,
   },
 });

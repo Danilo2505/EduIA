@@ -13,8 +13,8 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        headerShown: false, // 🔹 Remove o header em TODAS as tabs
-        tabBarActiveTintColor: "#007AFF", // azul estilo iOS
+        headerShown: false, 
+        tabBarActiveTintColor: "#007AFF", 
         tabBarStyle: { backgroundColor: "#fff" },
         tabBarLabelStyle: { fontWeight: "600" },
       }}
