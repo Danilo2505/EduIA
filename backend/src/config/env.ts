@@ -1,8 +1,8 @@
-import 'dotenv/config';
+import "dotenv/config";
 
 export const env = {
   port: Number(process.env.PORT ?? 4000),
-  jwtSecret: process.env.JWT_SECRET || 'secret',
+  jwtSecret: process.env.JWT_SECRET || "secret",
   db: {
     host: process.env.DB_HOST!,
     port: Number(process.env.DB_PORT ?? 3306),
@@ -10,4 +10,5 @@ export const env = {
     pass: process.env.DB_PASS!,
     name: process.env.DB_NAME!,
   },
+  openaiKey: process.env.OPENAI_API_KEY!, // aqui
 };

@@ -7,6 +7,7 @@ export default function NovoJogo() {
       placeholder="Explique o jogo: conteúdo a reforçar, regras, materiais, tempo, variações..."
       destinoLista="/jogos"
       prefixoResultado="🎮 Jogo educativo gerado:"
+      category="JOGO"
     />
   );
 }

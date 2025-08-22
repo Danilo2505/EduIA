@@ -3,7 +3,5 @@ export default makeListScreen({
   titulo: "Atividades Lúdicas",
   ctaRotulo: "Nova Atividade",
   ctaRota: "/atividades/novo",
-  seed: [
-    { id: "1", titulo: "Bingo das Sílabas", tag: "Linguagem", emoji: "🎲" },
-  ],
+  category: "ATIVIDADE", // chave usada pelo backend
 });

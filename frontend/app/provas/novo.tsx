@@ -1,3 +1,4 @@
+// app/provas/novo.tsx
 import PromptScreen from "@/layouts/Prompt";
 
 export default function NovaProva() {
@@ -7,6 +8,7 @@ export default function NovaProva() {
       placeholder="Informe disciplina, série, quantidade de questões, nível de dificuldade, habilidades (BNCC)..."
       destinoLista="/provas"
       prefixoResultado="📝 Prova/questões geradas:"
+      category="PROVA"
     />
   );
 }

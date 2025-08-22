@@ -8,48 +8,29 @@ import {
   SafeAreaView,
   ActivityIndicator,
 } from "react-native";
-import { useRouter, Href } from "expo-router";
-import { LinearGradient } from "expo-linear-gradient";
-
+import { useRouter } from "expo-router";
+import { useQuery } from "@tanstack/react-query";
+import { listContents, ContentItem } from "@/services/contents";
 import { useSession } from "@/hooks/useSession";
 import { useLogout } from "@/hooks/useLogout";
-
-type Conteudo = {
-  id: string;
-  titulo: string;
-  descricao: string;
-  categoria: "Plano de Aula" | "Atividade" | "História";
-  emoji: string;
-};
-
-const MOCK_CONTEUDOS: Conteudo[] = [
-  {
-    id: "1",
-    titulo: "Plano de Aula - Matemática",
-    descricao: "Adição e subtração com jogos educativos",
-    categoria: "Plano de Aula",
-    emoji: "📚",
-  },
-  {
-    id: "2",
-    titulo: "História - A Galinha dos Ovos de Ouro",
-    descricao: "História infantil com moral educativa",
-    categoria: "História",
-    emoji: "📖",
-  },
-];
+import AtalhoCard from "@/components/AtalhoCard"; // ✅ usa o componente pronto
 
 type Atalho = {
   label: string;
-  emoji: string;
-  to: Href;
-  gradient: [string, string];
+  icon: any;
+  to: string;
+  color: string;
 };
 
 export default function Home() {
   const router = useRouter();
-  const { data: session, isLoading } = useSession();
+  const { data: session, isLoading: loadingSession } = useSession();
   const logout = useLogout();
+
+  const { data: conteudos, isLoading } = useQuery<ContentItem[]>({
+    queryKey: ["conteudos"],
+    queryFn: () => listContents(),
+  });
 
   const primeiroNome = useMemo(() => {
     if (!session?.name) return "Usuário";
@@ -59,78 +40,72 @@ export default function Home() {
   const atalhos: Atalho[] = [
     {
       label: "Plano de Aula",
-      emoji: "📚",
+      icon: "book",
       to: "/plano-aula",
-      gradient: ["#6EE7F9", "#3B82F6"],
+      color: "#3B82F6",
     },
     {
       label: "Atividades",
-      emoji: "🎲",
+      icon: "game-controller",
       to: "/atividades",
-      gradient: ["#FDE68A", "#F59E0B"],
+      color: "#F59E0B",
     },
-    {
-      label: "Histórias",
-      emoji: "📖",
-      to: "/historias",
-      gradient: ["#FCA5A5", "#EF4444"],
-    },
+    { label: "Histórias", icon: "library", to: "/historias", color: "#EF4444" },
     {
       label: "Criação de Provas",
-      emoji: "📝",
+      icon: "document-text",
       to: "/provas",
-      gradient: ["#A7F3D0", "#10B981"],
+      color: "#10B981",
     },
     {
       label: "Sugestões de Projetos",
-      emoji: "💡",
+      icon: "bulb",
       to: "/projetos",
-      gradient: ["#DDD6FE", "#8B5CF6"],
+      color: "#8B5CF6",
     },
     {
       label: "Jogos Educativos",
-      emoji: "🎮",
+      icon: "game-controller",
       to: "/jogos",
-      gradient: ["#FBCFE8", "#EC4899"],
+      color: "#EC4899",
     },
     {
       label: "Recursos Inclusivos",
-      emoji: "♿",
+      icon: "accessibility",
       to: "/inclusao",
-      gradient: ["#E0F2FE", "#0284C7"],
+      color: "#0284C7",
     },
     {
       label: "Planejamento Semanal",
-      emoji: "🗓️",
+      icon: "calendar",
       to: "/planejamento",
-      gradient: ["#FDE68A", "#CA8A04"],
+      color: "#CA8A04",
     },
     {
       label: "Materiais de Apoio",
-      emoji: "📂",
+      icon: "folder",
       to: "/materiais",
-      gradient: ["#FBCFE8", "#DB2777"],
+      color: "#DB2777",
     },
   ];
 
-  function renderAtalho(a: Atalho) {
+  function renderConteudo({ item }: { item: ContentItem }) {
     return (
       <Pressable
-        key={a.label}
-        onPress={() => router.push(a.to)}
-        style={({ pressed }) => [
-          styles.atalho,
-          { transform: [{ scale: pressed ? 0.98 : 1 }] },
-        ]}
+        onPress={() => {}}
+        style={({ pressed }) => [styles.card, { opacity: pressed ? 0.85 : 1 }]}
       >
-        <LinearGradient colors={a.gradient} style={styles.atalhoGradient}>
-          <Text style={styles.atalhoEmoji}>{a.emoji}</Text>
-          <Text style={styles.atalhoTexto}>{a.label}</Text>
-        </LinearGradient>
+        <View style={styles.cardHeader}>
+          <Text style={styles.cardEmoji}>{item.emoji ?? "📘"}</Text>
+          <Text style={styles.cardCategoria}>{item.category}</Text>
+        </View>
+        <Text style={styles.cardTitulo}>{item.title}</Text>
+        <Text style={styles.cardDescricao}>{item.body}</Text>
       </Pressable>
     );
   }
-  if (isLoading) {
+
+  if (loadingSession || isLoading) {
     return (
       <SafeAreaView
         style={[
@@ -140,24 +115,9 @@ export default function Home() {
       >
         <ActivityIndicator />
         <Text style={{ marginTop: 8, color: "#6B7280" }}>
-          Carregando sessão...
+          Carregando dados...
         </Text>
       </SafeAreaView>
-    );
-  }
-  function renderConteudo({ item }: { item: Conteudo }) {
-    return (
-      <Pressable
-        onPress={() => {}}
-        style={({ pressed }) => [styles.card, { opacity: pressed ? 0.85 : 1 }]}
-      >
-        <View style={styles.cardHeader}>
-          <Text style={styles.cardEmoji}>{item.emoji}</Text>
-          <Text style={styles.cardCategoria}>{item.categoria}</Text>
-        </View>
-        <Text style={styles.cardTitulo}>{item.titulo}</Text>
-        <Text style={styles.cardDescricao}>{item.descricao}</Text>
-      </Pressable>
     );
   }
 
@@ -167,16 +127,14 @@ export default function Home() {
         contentContainerStyle={styles.container}
         ListHeaderComponent={
           <>
-            {/* Cabeçalho */}
             <View style={styles.header}>
               <View>
-                <Text style={styles.boasVindas}>Olá, {primeiroNome} 👋</Text>
+                <Text style={styles.boasVindas}>Olá, {primeiroNome} </Text>
                 <Text style={styles.subBoasVindas}>
                   O que vamos preparar hoje?
                 </Text>
               </View>
 
-              {/* Avatar + Logout */}
               <View style={{ alignItems: "center" }}>
                 <View style={styles.avatar}>
                   <Text style={styles.avatarTexto}>
@@ -203,22 +161,28 @@ export default function Home() {
               </View>
             </View>
 
-            {/* Atalhos rápidos */}
             <View style={styles.atalhosContainer}>
-              {atalhos.map(renderAtalho)}
+              {atalhos.map((a) => (
+                <AtalhoCard
+                  key={a.label}
+                  label={a.label}
+                  icon={a.icon}
+                  to={a.to as any}
+                  color={a.color}
+                />
+              ))}
             </View>
 
-            {/* Título seção */}
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitulo}>Últimos conteúdos</Text>
-              <Pressable onPress={() => router.push("/conteudos/index")}>
+              <Pressable onPress={() => router.push("/conteudos")}>
                 <Text style={styles.verTodos}>Ver todos</Text>
               </Pressable>
             </View>
           </>
         }
-        data={MOCK_CONTEUDOS}
-        keyExtractor={(i) => i.id}
+        data={conteudos ?? []}
+        keyExtractor={(i) => String(i.id)}
         renderItem={renderConteudo}
         ListEmptyComponent={
           <View style={styles.empty}>
@@ -261,28 +225,6 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     justifyContent: "space-between",
     marginBottom: 18,
-  },
-  atalho: {
-    width: "30%",
-    marginBottom: 12,
-    borderRadius: 14,
-    overflow: "hidden",
-  },
-  atalhoGradient: {
-    minHeight: 100,
-    paddingVertical: 14,
-    paddingHorizontal: 8,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  atalhoEmoji: { fontSize: 26, marginBottom: 6 },
-  atalhoTexto: {
-    color: "#fff",
-    fontWeight: "800",
-    fontSize: 13,
-    textAlign: "center",
-    lineHeight: 16,
-    flexShrink: 1,
   },
   sectionHeader: {
     marginTop: 6,

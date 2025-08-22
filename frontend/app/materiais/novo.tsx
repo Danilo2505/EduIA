@@ -1,3 +1,4 @@
+// app/materiais/novo.tsx
 import PromptScreen from "@/layouts/Prompt";
 
 export default function NovoMaterial() {
@@ -7,6 +8,7 @@ export default function NovoMaterial() {
       placeholder="Diga o tipo (cartaz, ficha, lista, roteiro), assunto, formato (tabela, tópicos), tamanho..."
       destinoLista="/materiais"
       prefixoResultado="📂 Material de apoio gerado:"
+      category="MATERIAL"
     />
   );
 }

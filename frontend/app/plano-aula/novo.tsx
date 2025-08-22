@@ -1,3 +1,4 @@
+// app/plano-aula/novo.tsx
 import PromptScreen from "@/layouts/Prompt";
 
 export default function NovoPlanoAula() {
@@ -7,6 +8,7 @@ export default function NovoPlanoAula() {
       placeholder="Explique o plano: série/ano, tema, objetivos (BNCC), duração, recursos, etapas..."
       destinoLista="/plano-aula"
       prefixoResultado="🧭 Plano de aula gerado:"
+      category="PLANO_AULA"
     />
   );
 }

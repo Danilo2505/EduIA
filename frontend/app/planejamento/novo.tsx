@@ -1,3 +1,4 @@
+// app/planejamento/novo.tsx
 import PromptScreen from "@/layouts/Prompt";
 
 export default function NovoPlanejamento() {
@@ -7,6 +8,7 @@ export default function NovoPlanejamento() {
       placeholder="Descreva o planejamento: objetivos, atividades, tempo, avaliação..."
       destinoLista="/planejamento"
       prefixoResultado="🗓️ Planejamento gerado:"
+      category="PLANEJAMENTO"
     />
   );
 }

@@ -7,6 +7,7 @@ export default function NovoProjeto() {
       placeholder="Descreva o projeto: tema, objetivos, etapas, recursos, avaliação, interdisciplinaridade..."
       destinoLista="/projetos"
       prefixoResultado="💡 Projeto gerado:"
+      category="PROJETO"
     />
   );
 }

@@ -1,3 +1,4 @@
+// layouts/Prompt/index.tsx
 import React, { useState } from "react";
 import {
   View,
@@ -15,22 +16,45 @@ import * as Clipboard from "expo-clipboard";
 import * as Print from "expo-print";
 import * as Sharing from "expo-sharing";
 
+import { useAIGenerate } from "@/hooks/useAI"; 
+import { createContent } from "@/services/contents"; 
+
+type Category =
+  | "PLANO_AULA"
+  | "ATIVIDADE"
+  | "HISTORIA"
+  | "PROVA"
+  | "PROJETO"
+  | "JOGO"
+  | "INCLUSAO"
+  | "PLANEJAMENTO"
+  | "MATERIAL";
+
 export default function Prompt({
   titulo,
   placeholder,
   destinoLista,
   prefixoResultado,
+  category, // ⬅️ nova prop
 }: {
   titulo: string;
   placeholder: string;
   destinoLista: Href;
   prefixoResultado: string;
+  category: Category;
 }) {
   const router = useRouter();
   const [tituloItem, setTituloItem] = useState("");
   const [prompt, setPrompt] = useState("");
   const [resposta, setResposta] = useState("");
-  const [loading, setLoading] = useState(false);
+
+  const { mutateAsync: gerarIA, isPending } = useAIGenerate({
+    onError: (e: any) =>
+      Alert.alert(
+        "Erro",
+        e?.response?.data?.error || e?.message || "Falha ao gerar."
+      ),
+  });
 
   async function copiarResultado() {
     await Clipboard.setStringAsync(`${tituloItem}\n\n${resposta}`);
@@ -43,42 +67,51 @@ export default function Prompt({
   async function baixarPDF() {
     try {
       const html = `
-        <html>
-          <body style="font-family: Arial; padding: 20px;">
-            <h2>${tituloItem || titulo}</h2>
-            <pre style="white-space: pre-wrap; font-size: 14px;">${resposta}</pre>
-          </body>
-        </html>
-      `;
+        <html><body style="font-family: Arial; padding: 20px;">
+          <h2>${tituloItem || titulo}</h2>
+          <pre style="white-space: pre-wrap; font-size: 14px;">${resposta}</pre>
+        </body></html>`;
       const { uri } = await Print.printToFileAsync({ html });
       await Sharing.shareAsync(uri, {
         UTI: ".pdf",
         mimeType: "application/pdf",
       });
-    } catch (error) {
+    } catch {
       Alert.alert("Erro", "Não foi possível gerar o PDF.");
     }
   }
 
-  function gerar() {
+  async function gerar() {
     if (!prompt.trim() || !tituloItem.trim()) {
       Alert.alert("Preencha o título e o conteúdo antes de gerar.");
       return;
     }
-    setLoading(true);
-    setTimeout(() => {
-      // remove o "Plano de aula gerado" daqui
-      setResposta(`${prompt}\n\nEra uma vez...`);
-      setLoading(false);
-    }, 1200);
+    const texto = await gerarIA(
+      // você pode ajustar esse “contexto” do prompt
+      `${prefixoResultado}\n\n${prompt}`.trim()
+    );
+    setResposta((texto || "").trim());
   }
 
-  function salvar() {
+  async function salvar() {
     if (!resposta) return;
-    router.push({
-      pathname: destinoLista,
-      params: { novoItem: `${tituloItem}\n\n${resposta}` },
-    } as never);
+
+    try {
+      await createContent({
+        title: tituloItem.trim(),
+        body: resposta,
+        category,
+        tag: "IA",
+        emoji: "🧠",
+      });
+
+      router.push(destinoLista as any);
+    } catch (e: any) {
+      Alert.alert(
+        "Erro",
+        e?.response?.data?.error || "Não foi possível salvar."
+      );
+    }
   }
 
   return (
@@ -92,7 +125,7 @@ export default function Prompt({
       </View>
 
       <ScrollView contentContainerStyle={s.container}>
-        {/* Campo de título */}
+        {/* Título */}
         <TextInput
           style={s.input}
           placeholder="Digite um título para este conteúdo..."
@@ -100,7 +133,7 @@ export default function Prompt({
           onChangeText={setTituloItem}
         />
 
-        {/* Campo de prompt */}
+        {/* Prompt */}
         <TextInput
           style={s.input}
           placeholder={placeholder}
@@ -109,13 +142,13 @@ export default function Prompt({
           onChangeText={setPrompt}
         />
 
-        {/* Botão Gerar */}
+        {/* Gerar */}
         <Pressable
-          style={[s.btn, loading && { opacity: 0.7 }]}
+          style={[s.btn, isPending && { opacity: 0.7 }]}
           onPress={gerar}
-          disabled={loading}
+          disabled={isPending}
         >
-          <Text style={s.btnText}>{loading ? "Gerando..." : "Gerar"}</Text>
+          <Text style={s.btnText}>{isPending ? "Gerando..." : "Gerar"}</Text>
         </Pressable>
 
         {/* Resultado */}
@@ -123,12 +156,11 @@ export default function Prompt({
           <View style={s.result}>
             <Text style={s.resultTitle}>{tituloItem}</Text>
 
-            {/* Mostra label apenas na tela */}
+            {/* label mostrado apenas na UI */}
             <Text style={{ color: "#6B7280", marginBottom: 8 }}>
-              📙 Plano de aula gerado:
+              {prefixoResultado}
             </Text>
 
-            {/* Conteúdo real */}
             <Text style={s.resultText}>{resposta}</Text>
 
             <View style={s.actionsRow}>
@@ -161,15 +193,8 @@ const s = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#E5E7EB",
   },
-  backBtn: {
-    marginRight: 8,
-    padding: 6,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: "800",
-    color: "#111",
-  },
+  backBtn: { marginRight: 8, padding: 6 },
+  headerTitle: { fontSize: 18, fontWeight: "800", color: "#111" },
   container: { padding: 20, paddingTop: 16 },
   input: {
     backgroundColor: "#fff",
@@ -199,11 +224,7 @@ const s = StyleSheet.create({
   },
   resultTitle: { fontSize: 16, fontWeight: "700", marginBottom: 6 },
   resultText: { fontSize: 14, color: "#444", marginBottom: 12, lineHeight: 20 },
-  actionsRow: {
-    flexDirection: "row",
-    marginBottom: 12,
-    gap: 12,
-  },
+  actionsRow: { flexDirection: "row", marginBottom: 12, gap: 12 },
   actionBtn: {
     flexDirection: "row",
     alignItems: "center",
@@ -212,11 +233,7 @@ const s = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 8,
   },
-  actionText: {
-    color: "#2563EB",
-    fontWeight: "600",
-    marginLeft: 6,
-  },
+  actionText: { color: "#2563EB", fontWeight: "600", marginLeft: 6 },
   saveBtn: {
     backgroundColor: "#10B981",
     paddingVertical: 12,

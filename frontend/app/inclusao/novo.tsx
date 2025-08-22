@@ -7,6 +7,7 @@ export default function NovoRecursoInclusivo() {
       placeholder="Informe a necessidade (visual, auditiva, motora, TEA...), objetivo, adaptações e estratégias..."
       destinoLista="/inclusao"
       prefixoResultado="♿ Recurso inclusivo gerado:"
+      category="INCLUSAO"
     />
   );
 }

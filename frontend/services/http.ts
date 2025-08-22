@@ -5,7 +5,7 @@ import { getToken } from "@/lib/session";
 export const http = axios.create({
   baseURL: API_URL,
   headers: { "Content-Type": "application/json" },
-  timeout: 15000,
+  timeout: 60000,
 });
 
 http.interceptors.request.use(async (config) => {

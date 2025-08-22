@@ -5,7 +5,7 @@ export default function NovaAtividade() {
     <PromptScreen
       titulo="Criar Atividade Lúdica com IA"
       placeholder="Descreva a atividade: objetivo, faixa etária, materiais, tempo, regras, avaliação..."
-      destinoLista="/atividades/index"
+      destinoLista="/atividades"
       prefixoResultado="🎲 Atividade gerada:"
     />
   );
