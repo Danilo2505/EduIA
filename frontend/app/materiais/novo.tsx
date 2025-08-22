@@ -1,4 +1,3 @@
-// app/materiais/novo.tsx
 import PromptScreen from "@/layouts/Prompt";
 
 export default function NovoMaterial() {

@@ -1,4 +1,3 @@
-// app/plano-aula/novo.tsx
 import PromptScreen from "@/layouts/Prompt";
 
 export default function NovoPlanoAula() {

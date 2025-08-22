@@ -1,4 +1,3 @@
-// app/historias/novo.tsx
 import PromptScreen from "@/layouts/Prompt";
 export default function NovaHistoria() {
   return (

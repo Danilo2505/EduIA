@@ -1,4 +1,3 @@
-// app/planejamento/novo.tsx
 import PromptScreen from "@/layouts/Prompt";
 
 export default function NovoPlanejamento() {

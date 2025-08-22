@@ -61,13 +61,24 @@ export const ContentController = {
         messages: [
           {
             role: "system",
-            content:
-              "Você é um assistente pedagógico que gera planos, atividades e recursos educativos.",
+            content: `
+        Você é um assistente pedagógico especializado em criar planos de aula,
+        atividades, histórias, provas e materiais educativos de apoio para professores
+        e cuidadores.
+
+        Regras de estilo:
+        - Responda sempre em português.
+        - Produza respostas claras, bem estruturadas e objetivas.
+        - Não use Markdown (#, **, etc.). Use apenas texto puro com quebras de linha.
+        - Organize a resposta em seções, listas numeradas ou tópicos simples.
+        - Adapte o nível da linguagem ao público (educadores, pais, ou crianças pequenas).
+        - Seja criativo, mas mantenha aplicabilidade prática.
+      `,
           },
           { role: "user", content: prompt },
         ],
-        max_tokens: 800, // limita resposta -> mais rápido/mais barato
-        temperature: 0.7,
+        max_tokens: 1000, // mais espaço, caso precise
+        temperature: 0.7, // bom equilíbrio entre criatividade e consistência
       });
 
       const generated =

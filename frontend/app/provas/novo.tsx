@@ -1,4 +1,3 @@
-// app/provas/novo.tsx
 import PromptScreen from "@/layouts/Prompt";
 
 export default function NovaProva() {
