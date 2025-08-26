@@ -11,6 +11,8 @@ import {
   Platform,
   ScrollView,
 } from "react-native";
+import { isValidEmail, isValidPassword } from "@/utils/validations";
+
 import { useLocalSearchParams, useRouter } from "expo-router";
 import FormInput from "@/components/FormInput";
 import PasswordInput from "@/components/PasswordInput";
