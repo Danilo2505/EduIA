@@ -30,9 +30,6 @@ export default function Register() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [confirmarSenha, setConfirmarSenha] = useState("");
-  const [mostrarSenha, setMostrarSenha] = useState(false);
-  const [mostrarConfirmar, setMostrarConfirmar] = useState(false);
-  const [aceitouTermos, setAceitouTermos] = useState(false);
 
   const { mutateAsync: doRegister, isPending } = useRegisterMutation({
     onSuccess: () => {
@@ -53,8 +50,7 @@ export default function Register() {
   const senhaOk = isValidPassword(senha);
   const confirmaOk = isConfirmedPassword(senha, confirmarSenha);
 
-  const podeEnviar =
-    nomeOk && emailOk && senhaOk && confirmaOk && aceitouTermos && !isPending;
+  const podeEnviar = nomeOk && emailOk && senhaOk && confirmaOk && !isPending;
 
   async function onSubmit() {
     if (!podeEnviar) return;
@@ -81,7 +77,7 @@ export default function Register() {
           </Text>
 
           <FormInput
-            placeholder="Nome completo"
+            placeholder="Nome"
             value={nome}
             onChangeText={setNome}
             autoCapitalize="words"

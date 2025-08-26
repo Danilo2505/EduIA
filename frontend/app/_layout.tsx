@@ -1,4 +1,3 @@
-// app/_layout.tsx
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
