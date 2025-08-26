@@ -221,4 +221,4 @@ Basta abrir uma *issue* ou enviar um *pull request*.
 
 ## 📄 Licença
 
-Este projeto está sob a licença *MIT*.
+Este projeto está sob a licença [MIT](./LICENSE).
