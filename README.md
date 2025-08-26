@@ -12,15 +12,11 @@ Native](https://img.shields.io/badge/React_Native-20232A?style=for-the-badge&log
 
 ## 📖 Sobre o Projeto
 
-O *EduIA* é um aplicativo educacional desenvolvido para **professores
-e educadores*, que integra **Inteligência Artificial* para auxiliar na
-criação de conteúdos pedagógicos.\
-Ele permite gerar automaticamente **planos de aula, atividades,
-histórias, jogos, provas e recursos inclusivos**, organizando tudo em um
-só lugar.
+O **EduIA** é um aplicativo educacional desenvolvido para **professores e educadores**, que integra **Inteligência Artificial** para auxiliar na criação de conteúdos pedagógicos.  
+Ele permite gerar automaticamente **planos de aula, atividades, histórias, jogos, provas e recursos inclusivos**, organizando tudo em um só lugar.  
 
-O objetivo é *otimizar o tempo do professor* e fornecer ferramentas
-práticas para personalizar o ensino de acordo com cada turma ou aluno.
+O objetivo é **otimizar o tempo do professor** e fornecer ferramentas práticas para personalizar o ensino de acordo com cada turma ou aluno.
+
 
 ------------------------------------------------------------------------
 
