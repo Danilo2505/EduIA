@@ -9,12 +9,11 @@ import "react-native-reanimated";
 
 export { ErrorBoundary } from "expo-router";
 
-// Deixa o app abrir no grupo de auth por padrão (pode usar Redirect em /index depois)
+// abre no grupo de auth por padrão
 export const unstable_settings = {
   initialRouteName: "(auth)",
 };
 
-// segura a splash até carregar as fontes
 SplashScreen.preventAutoHideAsync();
 
 const queryClient = new QueryClient();
