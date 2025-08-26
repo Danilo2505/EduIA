@@ -11,7 +11,17 @@ import {
   Platform,
   ScrollView,
 } from "react-native";
+import {
+  isValidEmail,
+  isValidName,
+  isValidPassword,
+  isConfirmedPassword,
+  passwordStrength,
+} from "@/utils/validations";
+
 import { useRouter } from "expo-router";
+import FormInput from "@/components/FormInput";
+import PasswordInput from "@/components/PasswordInput";
 import { useRegisterMutation } from "@/hooks/useAuth";
 
 export default function Register() {
@@ -38,20 +48,10 @@ export default function Register() {
     },
   });
 
-  const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
-  const nomeOk = nome.trim().length >= 2;
-
-  // força simples: +1 por cada critério atendido
-  const senhaLen = senha.length >= 6;
-  const senhaUpper = /[A-Z]/.test(senha);
-  const senhaDigit = /\d/.test(senha);
-  const senhaSpecial = /[^A-Za-z0-9]/.test(senha);
-  const forca = [senhaLen, senhaUpper, senhaDigit, senhaSpecial].filter(
-    Boolean
-  ).length;
-
-  const senhaOk = forca >= 3; // ajuste se quiser exigir 4/4
-  const confirmaOk = confirmarSenha.length > 0 && senha === confirmarSenha;
+  const emailOk = isValidEmail(email);
+  const nomeOk = isValidName(nome);
+  const senhaOk = isValidPassword(senha);
+  const confirmaOk = isConfirmedPassword(senha, confirmarSenha);
 
   const podeEnviar =
     nomeOk && emailOk && senhaOk && confirmaOk && aceitouTermos && !isPending;
@@ -80,21 +80,19 @@ export default function Register() {
             Cadastre-se para começar a usar o app.
           </Text>
 
-          <TextInput
-            style={styles.input}
+          <FormInput
             placeholder="Nome completo"
             value={nome}
             onChangeText={setNome}
             autoCapitalize="words"
             autoComplete="name"
             returnKeyType="next"
+            error={
+              !nomeOk && nome.length > 0 ? "Mínimo de 2 caracteres." : undefined
+            }
           />
-          {!nomeOk && nome.length > 0 && (
-            <Text style={styles.helper}>Mínimo de 2 caracteres.</Text>
-          )}
 
-          <TextInput
-            style={styles.input}
+          <FormInput
             placeholder="E-mail"
             value={email}
             onChangeText={setEmail}
@@ -102,121 +100,35 @@ export default function Register() {
             autoComplete="email"
             keyboardType="email-address"
             returnKeyType="next"
+            error={
+              !emailOk && email.length > 0
+                ? "Informe um e-mail válido."
+                : undefined
+            }
           />
-          {!emailOk && email.length > 0 && (
-            <Text style={styles.helper}>Informe um e-mail válido.</Text>
-          )}
 
-          {/* Senha */}
-          <View style={{ position: "relative" }}>
-            <TextInput
-              style={styles.input}
-              placeholder="Senha"
-              secureTextEntry={!mostrarSenha}
-              value={senha}
-              onChangeText={setSenha}
-              autoCapitalize="none"
-              autoComplete="password-new"
-              returnKeyType="next"
-            />
-            <TouchableOpacity
-              style={styles.toggle}
-              onPress={() => setMostrarSenha((v) => !v)}
-              hitSlop={10}
-            >
-              <Text style={styles.toggleText}>
-                {mostrarSenha ? "Ocultar" : "Mostrar"}
-              </Text>
-            </TouchableOpacity>
-          </View>
+          <PasswordInput
+            placeholder="Senha"
+            value={senha}
+            onChangeText={setSenha}
+            autoCapitalize="none"
+            autoComplete="password-new"
+            returnKeyType="next"
+          />
 
-          {/* Barra de força da senha */}
-          {senha.length > 0 && (
-            <View style={styles.strengthWrap}>
-              <View
-                style={[
-                  styles.strengthBar,
-                  forca >= 1 && { backgroundColor: "#F59E0B" },
-                ]}
-              />
-              <View
-                style={[
-                  styles.strengthBar,
-                  forca >= 2 && { backgroundColor: "#F59E0B" },
-                ]}
-              />
-              <View
-                style={[
-                  styles.strengthBar,
-                  forca >= 3 && { backgroundColor: "#10B981" },
-                ]}
-              />
-              <View
-                style={[
-                  styles.strengthBar,
-                  forca >= 4 && { backgroundColor: "#10B981" },
-                ]}
-              />
-            </View>
-          )}
-          {senha.length > 0 && (
-            <Text style={styles.strengthHint}>
-              Dica: use 6+ caracteres com maiúscula, número e símbolo.
-            </Text>
-          )}
-
-          {/* Confirmar senha */}
-          <View style={{ position: "relative" }}>
-            <TextInput
-              style={styles.input}
-              placeholder="Confirmar senha"
-              secureTextEntry={!mostrarConfirmar}
-              value={confirmarSenha}
-              onChangeText={setConfirmarSenha}
-              autoCapitalize="none"
-              returnKeyType="done"
-              onSubmitEditing={onSubmit}
-            />
-            <TouchableOpacity
-              style={styles.toggle}
-              onPress={() => setMostrarConfirmar((v) => !v)}
-              hitSlop={10}
-            >
-              <Text style={styles.toggleText}>
-                {mostrarConfirmar ? "Ocultar" : "Mostrar"}
-              </Text>
-            </TouchableOpacity>
-          </View>
-          {!confirmaOk && confirmarSenha.length > 0 && (
-            <Text style={styles.helper}>As senhas não coincidem.</Text>
-          )}
-
-          {/* Termos */}
-          <View style={styles.termsRow}>
-            <TouchableOpacity
-              onPress={() => setAceitouTermos((v) => !v)}
-              style={[styles.checkbox, aceitouTermos && styles.checkboxOn]}
-            >
-              {aceitouTermos && <Text style={{ fontWeight: "900" }}>✓</Text>}
-            </TouchableOpacity>
-            <Text style={styles.termsText}>
-              Li e aceito os{" "}
-              <Text
-                style={styles.linkInline}
-                onPress={() => router.push("/termos")}
-              >
-                Termos de Uso
-              </Text>{" "}
-              e a{" "}
-              <Text
-                style={styles.linkInline}
-                onPress={() => router.push("/privacidade")}
-              >
-                Política de Privacidade
-              </Text>
-              .
-            </Text>
-          </View>
+          <PasswordInput
+            placeholder="Confirmar senha"
+            value={confirmarSenha}
+            onChangeText={setConfirmarSenha}
+            autoCapitalize="none"
+            returnKeyType="done"
+            onSubmitEditing={onSubmit}
+            error={
+              !confirmaOk && confirmarSenha.length > 0
+                ? "As senhas não coincidem."
+                : undefined
+            }
+          />
 
           <TouchableOpacity
             style={[styles.button, !podeEnviar && { opacity: 0.6 }]}
@@ -235,7 +147,10 @@ export default function Register() {
             style={{ marginTop: 16 }}
           >
             <Text style={styles.linkCenter}>
-              Já tem conta? <Text style={{ fontWeight: "800" }}>Entrar</Text>
+              Já tem conta?{" "}
+              <Text style={{ fontWeight: "800", color: "#2563EB" }}>
+                Entrar
+              </Text>
             </Text>
           </TouchableOpacity>
         </View>
@@ -248,8 +163,8 @@ const styles = StyleSheet.create({
   center: {
     flexGrow: 1,
     padding: 20,
-    justifyContent: "center", 
-    alignItems: "center", 
+    justifyContent: "center",
+    alignItems: "center",
   },
   card: {
     width: "100%",
@@ -275,35 +190,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
     marginBottom: 16,
   },
-  input: {
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
-    backgroundColor: "#fff",
-    padding: 12,
-    borderRadius: 10,
-    marginBottom: 10,
-    fontSize: 14,
-  },
-  helper: { fontSize: 12, color: "#EF4444", marginTop: -6, marginBottom: 8 },
-  toggle: {
-    position: "absolute",
-    right: 12,
-    top: 12,
-  },
-  toggleText: { color: "#2563EB", fontWeight: "600" },
-  strengthWrap: {
-    flexDirection: "row",
-    gap: 6,
-    marginTop: -4,
-    marginBottom: 8,
-  },
-  strengthBar: {
-    flex: 1,
-    height: 6,
-    borderRadius: 999,
-    backgroundColor: "#E5E7EB",
-  },
-  strengthHint: { fontSize: 12, color: "#6B7280", marginBottom: 8 },
   termsRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -325,8 +211,15 @@ const styles = StyleSheet.create({
     backgroundColor: "#D1FAE5",
     borderColor: "#10B981",
   },
-  termsText: { flex: 1, color: "#374151", fontSize: 12 },
-  linkInline: { color: "#2563EB", fontWeight: "600" },
+  termsText: {
+    flex: 1,
+    color: "#374151",
+    fontSize: 12,
+  },
+  linkInline: {
+    color: "#2563EB",
+    fontWeight: "600",
+  },
   button: {
     backgroundColor: "#10B981",
     paddingVertical: 14,
@@ -339,6 +232,7 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     fontSize: 16,
   },
-  socialText: { color: "#111827", fontWeight: "700" },
-  linkCenter: { textAlign: "center", color: "#2563EB" },
+  linkCenter: {
+    textAlign: "center",
+  },
 });

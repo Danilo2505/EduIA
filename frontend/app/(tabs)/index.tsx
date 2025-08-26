@@ -30,7 +30,7 @@ export default function Home() {
       <AtalhosGrid />
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Minhas atividades</Text>
+        <Text style={styles.sectionTitle}>🔎 Minhas atividades</Text>
         <TextInput
           style={styles.searchInput}
           placeholder="Digite para pesquisar..."

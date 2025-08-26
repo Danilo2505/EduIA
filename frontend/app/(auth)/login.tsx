@@ -12,6 +12,8 @@ import {
   ScrollView,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import FormInput from "@/components/FormInput";
+import PasswordInput from "@/components/PasswordInput";
 import { useLoginMutation } from "@/hooks/useAuth";
 
 export default function Login() {
@@ -20,7 +22,6 @@ export default function Login() {
 
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
-  const [mostrarSenha, setMostrarSenha] = useState(false);
 
   const { mutateAsync: doLogin, isPending } = useLoginMutation({
     onSuccess: () => router.replace("/(tabs)"),
@@ -61,8 +62,7 @@ export default function Login() {
             Bem-vindo de volta! Acesse sua conta.
           </Text>
 
-          <TextInput
-            style={styles.input}
+          <FormInput
             placeholder="E-mail"
             value={email}
             onChangeText={setEmail}
@@ -70,43 +70,27 @@ export default function Login() {
             autoComplete="email"
             keyboardType="email-address"
             returnKeyType="next"
+            error={
+              !emailOk && email.length > 0
+                ? "Informe um e-mail válido."
+                : undefined
+            }
           />
-          {!emailOk && email.length > 0 && (
-            <Text style={styles.helper}>Informe um e-mail válido.</Text>
-          )}
 
-          <View style={{ position: "relative" }}>
-            <TextInput
-              style={styles.input}
-              placeholder="Senha"
-              value={senha}
-              onChangeText={setSenha}
-              secureTextEntry={!mostrarSenha}
-              autoCapitalize="none"
-              autoComplete="password"
-              returnKeyType="done"
-              onSubmitEditing={onSubmit}
-            />
-            <TouchableOpacity
-              style={styles.toggle}
-              onPress={() => setMostrarSenha((v) => !v)}
-              hitSlop={10}
-            >
-              <Text style={styles.toggleText}>
-                {mostrarSenha ? "Ocultar" : "Mostrar"}
-              </Text>
-            </TouchableOpacity>
-          </View>
-          {!senhaOk && senha.length > 0 && (
-            <Text style={styles.helper}>Mínimo de 6 caracteres.</Text>
-          )}
-
-          <View style={styles.actionsRow}>
-            <View style={{ flex: 1 }} />
-            <TouchableOpacity onPress={() => router.push("/")}>
-              <Text style={styles.linkInline}>Esqueci minha senha</Text>
-            </TouchableOpacity>
-          </View>
+          <PasswordInput
+            placeholder="Senha"
+            value={senha}
+            onChangeText={setSenha}
+            autoCapitalize="none"
+            autoComplete="password"
+            returnKeyType="done"
+            onSubmitEditing={onSubmit}
+            error={
+              !senhaOk && senha.length > 0
+                ? "Mínimo de 6 caracteres."
+                : undefined
+            }
+          />
 
           <TouchableOpacity
             style={[styles.buttonPrimary, !podeEnviar && { opacity: 0.6 }]}
@@ -126,7 +110,9 @@ export default function Login() {
           >
             <Text style={styles.linkCenter}>
               Não tem conta?{" "}
-              <Text style={{ fontWeight: "800" }}>Registrar</Text>
+              <Text style={{ fontWeight: "800", color: "#2563EB" }}>
+                Registrar
+              </Text>
             </Text>
           </TouchableOpacity>
         </View>
@@ -166,39 +152,19 @@ const styles = StyleSheet.create({
     marginTop: 4,
     marginBottom: 16,
   },
-  input: {
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
-    backgroundColor: "#fff",
-    padding: 12,
-    borderRadius: 10,
-    marginBottom: 10,
-    fontSize: 14,
-  },
-  helper: { fontSize: 12, color: "#EF4444", marginTop: -6, marginBottom: 8 },
-  toggle: { position: "absolute", right: 12, top: 12 },
-  toggleText: { color: "#2563EB", fontWeight: "600" },
-  actionsRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 4,
-    marginBottom: 8,
-  },
   buttonPrimary: {
-    backgroundColor: "#2563EB", // azul pro login (no register era verde)
+    backgroundColor: "#2563EB", // azul pro login
     paddingVertical: 14,
     borderRadius: 10,
     alignItems: "center",
     marginTop: 8,
   },
-  buttonText: { color: "#fff", fontWeight: "800", fontSize: 16 },
-  divider: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    marginVertical: 16,
+  buttonText: {
+    color: "#fff",
+    fontWeight: "800",
+    fontSize: 16,
   },
-
-  linkCenter: { textAlign: "center", color: "#2563EB" },
-  linkInline: { color: "#2563EB", fontWeight: "600" },
+  linkCenter: {
+    textAlign: "center",
+  },
 });

@@ -15,8 +15,8 @@ import * as Clipboard from "expo-clipboard";
 
 import { useAIGenerate } from "@/hooks/useAI";
 import { createContent } from "@/services/contents";
-import { limparMarkdown } from "@/utils/limparMarkdown";
-import { gerarPDF } from "@/utils/gerarPDF";
+import { limparMarkdown } from "@/utils/Markdown";
+import { gerarPDF } from "@/utils/PDF";
 
 type Category =
   | "PLANO_AULA"

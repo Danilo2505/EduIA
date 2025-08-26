@@ -1,9 +1,9 @@
 import * as Print from "expo-print";
 import * as Sharing from "expo-sharing";
 import { Alert } from "react-native";
-import { limparMarkdown } from "./limparMarkdown";
+import { limparMarkdown } from "./Markdown";
 
-export async function gerarPDF(titulo: string, resposta: string) {
+export async function PDF(titulo: string, resposta: string) {
   try {
     const html = `
       <html>

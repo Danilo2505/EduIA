@@ -1,4 +1,3 @@
-// hooks/useAuth.ts
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { login, register } from "@/services/auth";
 import { type Session } from "@/lib/session";
