@@ -16,7 +16,7 @@ import * as Clipboard from "expo-clipboard";
 import { useAIGenerate } from "@/hooks/useAI";
 import { createContent } from "@/services/contents";
 import { limparMarkdown } from "@/utils/Markdown";
-import { gerarPDF } from "@/utils/PDF";
+import { PDF } from "@/utils/PDF";
 
 type Category =
   | "PLANO_AULA"
@@ -64,7 +64,7 @@ export default function Prompt({
   }
 
   async function baixarPDF() {
-    await gerarPDF(tituloItem || titulo, resposta);
+    await PDF(tituloItem || titulo, resposta);
   }
 
   async function gerar() {
@@ -105,7 +105,6 @@ export default function Prompt({
       </View>
 
       <ScrollView contentContainerStyle={s.container}>
-        {/* Título */}
         <TextInput
           style={s.input}
           placeholder="Digite um título para este conteúdo..."
@@ -113,7 +112,6 @@ export default function Prompt({
           onChangeText={setTituloItem}
         />
 
-        {/* Prompt */}
         <TextInput
           style={s.input}
           placeholder={placeholder}
@@ -122,7 +120,6 @@ export default function Prompt({
           onChangeText={setPrompt}
         />
 
-        {/* Gerar */}
         <Pressable
           style={[s.btn, isPending && { opacity: 0.7 }]}
           onPress={gerar}
@@ -131,7 +128,6 @@ export default function Prompt({
           <Text style={s.btnText}>{isPending ? "Gerando..." : "Gerar"}</Text>
         </Pressable>
 
-        {/* Resultado */}
         {!!resposta && (
           <View style={s.result}>
             <Text style={s.resultTitle}>{tituloItem}</Text>

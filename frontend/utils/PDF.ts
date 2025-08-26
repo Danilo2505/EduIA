@@ -48,9 +48,7 @@ export async function PDF(titulo: string, resposta: string) {
           <div class="box">
             <p>${limparMarkdown(resposta)}</p>
           </div>
-          <div class="footer">
-            Gerado automaticamente com IA ✨
-          </div>
+
         </body>
       </html>
     `;
